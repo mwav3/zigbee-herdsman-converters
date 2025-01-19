@@ -1,34 +1,47 @@
 [![NPM](https://nodei.co/npm/zigbee-herdsman-converters.png)](https://nodei.co/npm/zigbee-herdsman-converters/)
 
 # zigbee-herdsman-converters
+
 Collection of device converters to be used with zigbee-herdsman.
 
+## Breaking changes
+
+20.0.0
+
+- A toZigbee converter is now allowed to not define any `key`, in this case the converter should be used for any key.
+
+    19.0.0
+
+- Legacy extend was removed
+
+    18.0.0
+
+- After converting a message with a fromZigbee converter, `postProcessConvertedFromZigbeeMessage` should be called now (for applying calibration/precision)
+
+    17.0.0
+
+- Various methods in `index.ts` are now async and return a `Promise`
+
+    15.0.0
+
+- OTA `isUpdateAvailable` now returns an object instead of a boolean (e.g. `{available: true, currentFileVersion: 120, otaFileVersion: 125}`)
+- OTA `updateToLatest` now returns a number (`fileVersion` of the new OTA) instead of a void
+
 ## Contributing
-See [Zigbee2MQTT how to support new devices](http://www.zigbee2mqtt.io/how_tos/how_to_support_new_devices.html).
+
+See [Zigbee2MQTT how to support new devices](https://www.zigbee2mqtt.io/advanced/support-new-devices/01_support_new_devices.html).
 
 ## Submitting a pull request
+
 If you'd like to submit a pull request, you should run the following commands to ensure your changes will pass the tests:
+
 ```sh
-npm run lint
-npm test
+npm install -g pnpm
+pnpm install --frozen-lockfile
+pnpm run eslint --fix
+pnpm run pretty:write
+pnpm run build
+pnpm test
 ```
 
 If any of those commands finish with an error your PR won't pass the tests and will likely be rejected.
-
-## Documentation of definition meta property
-- `multiEndpoint`: enables the multi endpoint functionallity in e.g. fromZigbee.on_off, example: normally this converter would return {"state": "OFF"}, when multiEndpoint is enabled the 'endpoint' method of the device definition will be called to determine the endpoint name which is then used as key e.g. {"state_left": "OFF"}. Only needed when device sends the same attribute from multiple endpoints. (default: false)
-- `disableDefaultResponse`: used by toZigbee converters to disable the default response of some devices as they don't provide one. (default: false)
-- `applyRedFix`: see toZigbee.light_color (default: false)
-- `enhancedHue`: see toZigbee.light_color (default: true)
-- `supportsHueAndSaturation`: see toZigbee.light_color (default: false)
-- `timeout`: timeout for commands to this device used in toZigbee. (default: 10000)
-- `coverInverted`: Set to true for cover controls that report position=100 as open (default: false)
-- `turnsOffAtBrightness1`: Indicates light turns off when brightness 1 is set (default: false)
-- `pinCodeCount`: Amount of pincodes the lock can handle
-- `disableActionGroup`: Prevents some converters adding the action_group to the payload (default: false)
-- `tuyaThermostatSystemMode`/`tuyaThermostatPreset`: TuYa specific thermostat options
-- `thermostat`: see e.g. HT-08 definition
-- `battery`:
-  - `{dontDividePercentage: true}`: prevents batteryPercentageRemainig from being divided (ZCL 200=100%, but some report 100=100%) (default: false)
-  - `{voltageToPercentage: '3V_2100'}`: convert voltage to percentage using specified option. See utils.batteryVoltageToPercentage() (default: null, no voltage to percentage conversion)
-- `fanStateOn`: value used for fan_mode when using fan_state="ON", the default is "on"
